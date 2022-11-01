@@ -21,7 +21,6 @@ const Products = (props) => {
 			.then(res => {
 				setProducts(res)
 			});
-
 			if (localStorage.token && localStorage.username) {
 				setLoggedInUser({
 					token: localStorage.token,
@@ -85,7 +84,7 @@ const Products = (props) => {
 
 		if (!edit) {
 			setOpen(true)
-			setTimeout(function(){ setOpen(false)}, 3000);
+			setTimeout(function(){ setOpen(false)}, 1500);
 		}
 		
 	};

@@ -13,6 +13,12 @@ apiRouter.use(
   }
 ));
 
+apiRouter.use( (req, res, next) => {
+  console.log(req.method + ' - ' + req.path)
+  console.log(req.body)
+  next();
+})
+
 apiRouter.use(async (req, res, next) => {
   const prefix = 'Bearer ';
   const auth = req.header('Authorization');

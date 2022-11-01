@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { editProduct, getProductById } from '../axios-services';
+import { getProductById, editProduct, addProductToOrder, addProductToOrderGuest, initiateOrder, initiateGuestCart, isTokenAdmin } from '../axios-services';
 import {
 	TextField,
 	Button,
@@ -25,6 +25,9 @@ const SingleProductView = (props) => {
 	const [img, setImg] = useState('');
 	const [stock, setStock] = useState('');
 	const [open, setOpen] = useState(false);
+	const [loggedInUser, setLoggedInUser] = useState({});
+	const [order, setOrder] = useState();
+	const [isAdmin, setIsAdmin] = useState(false);
 	const edit = props.edit;
 	const token = props.token;
 
@@ -52,6 +55,31 @@ const SingleProductView = (props) => {
 	};
 
 	useEffect(() => {
+		
+			if (localStorage.token && localStorage.username) {
+				setLoggedInUser({
+					token: localStorage.token,
+					username: localStorage.username,
+				});
+				initiateOrder(localStorage.token)
+					.then(res => {
+						setOrder(res)
+					})
+				isTokenAdmin(localStorage.token)
+				.then(res => {
+					if (res === 'User is an authorized admin'){
+						setIsAdmin(true);
+					} else {
+						setIsAdmin(false);
+					}
+				})
+				} else {
+					initiateGuestCart()
+					.then(res => {
+						setOrder(res)
+					})
+				}
+	
 		getProductById(id).then((res) => {
 			setProduct(res);
 			if (edit) {
@@ -66,10 +94,27 @@ const SingleProductView = (props) => {
 				navigate(-1);
 			}
 		});
+	
 	}, []);
 
 	const handleClose = (event) => {
 		setOpen(false);
+	};
+
+	const handleAddToCart = (e) => {
+
+		if (loggedInUser.token){
+			addProductToOrder(product, order, loggedInUser.token)
+		} else {
+			addProductToOrderGuest(product)
+		}
+		
+
+		if (!edit) {
+			setOpen(true)
+			setTimeout(function(){ setOpen(false)}, 1500);
+		}
+		
 	};
 
 	return (
@@ -83,7 +128,7 @@ const SingleProductView = (props) => {
 								{product.name} ${product.price}
 							</h2>
 							<h3>{product.description}</h3>
-							<Button variant='contained'>
+							<Button onClick={(e) => handleAddToCart(e)} variant='contained'>
 								Add to cart
 							</Button>{' '}
 						</>
@@ -190,7 +235,7 @@ const SingleProductView = (props) => {
 					severity='success'
 					sx={{ width: '100%' }}
 				>
-					Changes Saved
+					{edit ? 'Changes Saved' : 'Added to Cart'}
 				</Alert>
 			</Snackbar>
 		</div>

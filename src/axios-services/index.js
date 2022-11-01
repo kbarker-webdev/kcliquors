@@ -86,6 +86,7 @@ export async function addProductToOrder(product, order, token){
 
 export async function addProductToOrderGuest(product){
 	try {
+		console.log('axios aptog - ', product)
 		const postData = {
 			product_id: product.id, 
 			product_name: product.name, 

@@ -3,6 +3,7 @@ const guestRouter = express.Router();
 
 guestRouter.post('/', async (req, res, next) => {
     const { cart } = req.session;
+    
     if (!cart) {
         req.session.cart = {items: []};
         res.send(cart)

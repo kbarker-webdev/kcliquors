@@ -76,6 +76,7 @@ const App = () => {
 		setLoggedInUser({});
 
 		const resp = await login('JohnSnow', 'winteriscoming');
+
 		const token = resp.token;
 		const user = { username: 'JohnSnow', token };
 		localStorage.setItem('token', token);
